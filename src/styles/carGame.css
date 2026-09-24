@@ -1,0 +1,370 @@
+/* Estilos Retro Arcade Synthwave para o Jogo de Carro */
+
+:root {
+  --bg-color: #0b0c10;
+  --road-color: #1f2833;
+  --neon-cyan: #66fcf1;
+  --neon-magenta: #ff007f;
+  --neon-yellow: #ffe600;
+  --neon-green: #39ff14;
+  --retro-font: 'Courier New', Courier, monospace, 'Lucida Console', Monaco;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: #ffffff;
+  font-family: var(--retro-font);
+  font-weight: bold;
+  overflow-x: hidden;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.car-game-container {
+  width: 100vw;
+  max-width: 500px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px;
+  position: relative;
+  background-color: #07090e;
+  box-shadow: 0 0 40px rgba(102, 252, 241, 0.2);
+}
+
+@media (min-width: 768px) {
+  .car-game-container {
+    min-height: 720px;
+    height: 96vh;
+    border: 3px solid #222e3d;
+    border-radius: 12px;
+    margin: auto;
+  }
+}
+
+/* Screenshake */
+.screen-shake {
+  animation: shake 0.35s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-4px, 0, 0); }
+  20%, 80% { transform: translate3d(5px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-7px, 0, 0); }
+  40%, 60% { transform: translate3d(7px, 0, 0); }
+}
+
+/* Painel de Instrumentos Superior (HUD) */
+.arcade-hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #111622;
+  border: 2px solid #2b394e;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.hud-stat-box {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hud-stat-label {
+  font-size: 10px;
+  color: #8da4c4;
+  letter-spacing: 1px;
+}
+
+.hud-stat-value {
+  font-size: 16px;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 6px var(--neon-cyan);
+}
+
+/* Barra de Combustível e Nitro */
+.gauges-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.gauge-card {
+  background: #10141d;
+  border: 1px solid #2a3547;
+  border-radius: 6px;
+  padding: 6px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gauge-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+}
+
+.gauge-bar-track {
+  width: 100%;
+  height: 10px;
+  background: #1c2331;
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid #33435c;
+}
+
+.fuel-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ef4444, #eab308, #22c55e);
+  transition: width 0.15s ease-out;
+}
+
+.nitro-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, var(--neon-cyan));
+  box-shadow: 0 0 8px var(--neon-cyan);
+  transition: width 0.15s ease-out;
+}
+
+/* Área da Pista / Canvas */
+.track-canvas-wrapper {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  min-height: 380px;
+  background: #000;
+  border: 3px solid #33435c;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.game-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Indicador de Velocidade Flutuante */
+.speedometer-floating {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: rgba(10, 14, 22, 0.85);
+  border: 1px solid var(--neon-cyan);
+  border-radius: 6px;
+  padding: 4px 10px;
+  text-align: right;
+  pointer-events: none;
+}
+
+.speed-number {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--neon-yellow);
+  text-shadow: 0 0 10px var(--neon-yellow);
+}
+
+.speed-unit {
+  font-size: 10px;
+  color: #aaa;
+  margin-left: 4px;
+}
+
+/* Alerta de "Near Miss" / Raspão */
+.near-miss-banner {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 0, 127, 0.9);
+  color: #fff;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  letter-spacing: 2px;
+  box-shadow: 0 0 15px var(--neon-magenta);
+  animation: bannerPop 0.8s forwards ease-out;
+  pointer-events: none;
+}
+
+@keyframes bannerPop {
+  0% { transform: translateX(-50%) scale(0.6); opacity: 0; }
+  25% { transform: translateX(-50%) scale(1.2); opacity: 1; }
+  80% { transform: translateX(-50%) scale(1); opacity: 1; }
+  100% { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+}
+
+/* Controles Touch na Tela para Celular */
+.touch-controls-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 8px;
+  padding: 6px 2px;
+}
+
+.touch-steering-group, .touch-actions-group {
+  display: flex;
+  gap: 8px;
+}
+
+.touch-btn {
+  flex: 1;
+  background: #141b26;
+  border: 2px solid #33435c;
+  color: #ffffff;
+  padding: 14px 4px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 900;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+  transition: all 0.1s;
+}
+
+.touch-btn:active {
+  background: var(--neon-cyan);
+  color: #000;
+  border-color: #fff;
+  transform: scale(0.96);
+}
+
+.touch-btn-nitro {
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+}
+
+.touch-btn-nitro:active {
+  background: var(--neon-cyan);
+  color: #000;
+}
+
+.touch-btn-brake {
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.touch-btn-brake:active {
+  background: #ef4444;
+  color: #fff;
+}
+
+/* Telas Especiais: Menu e Game Over */
+.modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 7, 12, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+  z-index: 100;
+  border-radius: 8px;
+}
+
+.arcade-title {
+  font-size: 38px;
+  color: var(--neon-yellow);
+  letter-spacing: 4px;
+  text-shadow: 0 0 20px var(--neon-yellow), 0 0 35px var(--neon-magenta);
+  margin-bottom: 6px;
+  animation: titlePulse 1.8s infinite alternate;
+}
+
+@keyframes titlePulse {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.05); }
+}
+
+.arcade-subtitle {
+  font-size: 13px;
+  color: var(--neon-cyan);
+  letter-spacing: 2px;
+  margin-bottom: 24px;
+}
+
+.arcade-btn-primary {
+  padding: 14px 34px;
+  background: #000;
+  border: 3px solid var(--neon-cyan);
+  color: var(--neon-cyan);
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 900;
+  cursor: pointer;
+  letter-spacing: 2px;
+  border-radius: 6px;
+  box-shadow: 0 0 15px rgba(102, 252, 241, 0.4);
+  transition: all 0.2s;
+  margin-top: 16px;
+}
+
+.arcade-btn-primary:hover {
+  background: var(--neon-cyan);
+  color: #000;
+  box-shadow: 0 0 25px var(--neon-cyan);
+  transform: scale(1.05);
+}
+
+.instructions-card {
+  background: #111724;
+  border: 1px solid #2b394e;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 12px;
+  color: #ccc;
+  line-height: 1.6;
+  max-width: 380px;
+  margin: 12px 0;
+  text-align: left;
+}
+
+.game-over-stats {
+  background: #101622;
+  border: 1px solid #33435c;
+  border-radius: 8px;
+  padding: 16px;
+  width: 100%;
+  max-width: 320px;
+  margin: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+.stat-row-value {
+  color: var(--neon-cyan);
+  font-weight: bold;
+}
