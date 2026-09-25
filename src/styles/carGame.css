@@ -13,7 +13,7 @@
   --tg-dark: #09090b;
   --tg-dark-blue: #0f172a;
   --tg-border: #334155;
-  --tg-font: 'Courier New', Courier, monospace, 'Lucida Console', Monaco;
+  --tg-font: "Courier New", Courier, monospace, "Lucida Console", Monaco;
 }
 
 * {
@@ -25,7 +25,8 @@
   font-family: var(--tg-font);
 }
 
-html, body {
+html,
+body {
   background-color: #030407;
   color: #ffffff;
   overflow: hidden;
@@ -56,7 +57,9 @@ html, body {
   display: flex;
   flex-direction: column;
   position: relative;
-  box-shadow: 0 0 60px rgba(0, 0, 0, 0.9), 0 0 25px rgba(56, 189, 248, 0.25);
+  box-shadow:
+    0 0 60px rgba(0, 0, 0, 0.9),
+    0 0 25px rgba(56, 189, 248, 0.25);
   border: 2px solid #1e293b;
   overflow: hidden;
 }
@@ -200,8 +203,10 @@ html, body {
 }
 
 .tg-render-canvas {
-  width: 100%;
-  height: 100%;
+  width: min(100%, 960px);
+  height: auto;
+  max-height: 100%;
+  aspect-ratio: 8 / 5;
   object-fit: fill;
   display: block;
   image-rendering: pixelated;
@@ -281,8 +286,12 @@ html, body {
 }
 
 @keyframes pulse-redline {
-  from { filter: brightness(1); }
-  to { filter: brightness(1.7); }
+  from {
+    filter: brightness(1);
+  }
+  to {
+    filter: brightness(1.7);
+  }
 }
 
 .tg-gear-text {
@@ -340,8 +349,14 @@ html, body {
 }
 
 @keyframes nitro-fire {
-  from { transform: scale(1); filter: brightness(1); }
-  to { transform: scale(1.15); filter: brightness(1.8); }
+  from {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  to {
+    transform: scale(1.15);
+    filter: brightness(1.8);
+  }
 }
 
 /* Combustível */
@@ -386,8 +401,13 @@ html, body {
 }
 
 @keyframes blink-fuel {
-  from { border-color: var(--tg-border); }
-  to { border-color: #ef4444; box-shadow: 0 0 8px #ef4444; }
+  from {
+    border-color: var(--tg-border);
+  }
+  to {
+    border-color: #ef4444;
+    box-shadow: 0 0 8px #ef4444;
+  }
 }
 
 .tg-pit-alert {
@@ -486,8 +506,14 @@ html, body {
 }
 
 @keyframes pitstop-pop {
-  from { transform: translate(-50%, -50%) scale(0.7); opacity: 0; }
-  to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  from {
+    transform: translate(-50%, -50%) scale(0.7);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
 }
 
 .tg-pitstop-title {
@@ -547,7 +573,9 @@ html, body {
   background: #0f172a;
   border: 3px solid #334155;
   border-radius: 10px;
-  box-shadow: 0 0 40px rgba(0, 0, 0, 0.9), 0 0 20px rgba(56, 189, 248, 0.3);
+  box-shadow:
+    0 0 40px rgba(0, 0, 0, 0.9),
+    0 0 20px rgba(56, 189, 248, 0.3);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -566,7 +594,9 @@ html, body {
   font-weight: 900;
   color: var(--tg-yellow);
   letter-spacing: 3px;
-  text-shadow: 3px 3px 0px #b45309, 0 0 16px rgba(250, 204, 21, 0.6);
+  text-shadow:
+    3px 3px 0px #b45309,
+    0 0 16px rgba(250, 204, 21, 0.6);
 }
 
 .tg-sub-title {
@@ -585,8 +615,114 @@ html, body {
 }
 
 @media (max-width: 720px) {
+  .topgear-app-container {
+    height: 100dvh;
+  }
+
+  .tg-render-canvas {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    aspect-ratio: auto;
+  }
+
+  .tg-header-bar {
+    height: 42px;
+    padding-inline: 8px;
+  }
+
+  .tg-hdr-label,
+  .tg-time-card {
+    font-size: 8px;
+  }
+
+  .tg-rank-number {
+    font-size: 17px;
+  }
+
+  .tg-cockpit-bar {
+    height: 54px;
+    padding-inline: 8px;
+    gap: 6px;
+  }
+
+  .tg-speed-box,
+  .tg-fuel-box {
+    min-width: 0;
+  }
+
+  .tg-speed-digital {
+    font-size: 19px;
+  }
+
+  .tg-fuel-title-row,
+  .tg-nitro-title {
+    font-size: 8px;
+  }
+
+  .tg-rpm-track {
+    width: 56px;
+  }
+
+  .tg-bottle {
+    width: 20px;
+    height: 20px;
+  }
+
+  .tg-touch-bar {
+    height: 62px;
+    padding: 4px 6px;
+    gap: 5px;
+  }
+
+  .tg-touch-group {
+    gap: 4px;
+  }
+
+  .tg-touch-btn {
+    min-width: 44px;
+    padding: 9px 8px;
+    font-size: 11px;
+  }
+
+  .tg-touch-accel {
+    min-width: 62px;
+  }
+
   .tg-select-body {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 340px) {
+  .tg-touch-bar {
+    padding-inline: 3px;
+    gap: 2px;
+  }
+
+  .tg-touch-group {
+    gap: 2px;
+  }
+
+  .tg-touch-btn {
+    min-width: 0;
+    padding: 7px 4px;
+    font-size: 9px;
+    white-space: nowrap;
+  }
+
+  .tg-touch-steer .tg-touch-btn {
+    min-width: 41px;
+  }
+
+  .tg-touch-horn {
+    width: 30px;
+    padding-inline: 2px;
+    font-size: 14px;
+  }
+
+  .tg-touch-accel {
+    min-width: 0;
   }
 }
 
