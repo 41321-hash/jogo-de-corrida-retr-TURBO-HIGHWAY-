@@ -10,12 +10,12 @@ export default function TouchControls({ touchState }) {
   };
 
   return (
-    <div className="touch-controls-grid">
+    <div className="tg-touch-bar">
       {/* Botões de Direção Esquerda / Direita */}
-      <div className="touch-steering-group">
+      <div className="tg-touch-group tg-touch-steer">
         <button
           type="button"
-          className="touch-btn"
+          className="tg-touch-btn tg-touch-left"
           onMouseDown={() => handleTouch('left', true)}
           onMouseUp={() => handleTouch('left', false)}
           onTouchStart={(e) => { e.preventDefault(); handleTouch('left', true); }}
@@ -26,7 +26,7 @@ export default function TouchControls({ touchState }) {
 
         <button
           type="button"
-          className="touch-btn"
+          className="tg-touch-btn tg-touch-right"
           onMouseDown={() => handleTouch('right', true)}
           onMouseUp={() => handleTouch('right', false)}
           onTouchStart={(e) => { e.preventDefault(); handleTouch('right', true); }}
@@ -36,11 +36,20 @@ export default function TouchControls({ touchState }) {
         </button>
       </div>
 
-      {/* Botões de Ação: Nitro, Freio, Buzina */}
-      <div className="touch-actions-group">
+      {/* Botão de Buzina Central */}
+      <button
+        type="button"
+        className="tg-touch-btn tg-touch-horn"
+        onClick={() => carAudio.playHorn()}
+      >
+        📢
+      </button>
+
+      {/* Botões de Nitro, Freio e Acelerador */}
+      <div className="tg-touch-group tg-touch-pedals">
         <button
           type="button"
-          className="touch-btn touch-btn-brake"
+          className="tg-touch-btn tg-touch-brake"
           onMouseDown={() => handleTouch('brake', true)}
           onMouseUp={() => handleTouch('brake', false)}
           onTouchStart={(e) => { e.preventDefault(); handleTouch('brake', true); }}
@@ -51,13 +60,24 @@ export default function TouchControls({ touchState }) {
 
         <button
           type="button"
-          className="touch-btn touch-btn-nitro"
+          className="tg-touch-btn tg-touch-nitro"
           onMouseDown={() => handleTouch('nitro', true)}
           onMouseUp={() => handleTouch('nitro', false)}
           onTouchStart={(e) => { e.preventDefault(); handleTouch('nitro', true); }}
           onTouchEnd={(e) => { e.preventDefault(); handleTouch('nitro', false); }}
         >
           ⚡ NITRO
+        </button>
+
+        <button
+          type="button"
+          className="tg-touch-btn tg-touch-accel"
+          onMouseDown={() => handleTouch('accel', true)}
+          onMouseUp={() => handleTouch('accel', false)}
+          onTouchStart={(e) => { e.preventDefault(); handleTouch('accel', true); }}
+          onTouchEnd={(e) => { e.preventDefault(); handleTouch('accel', false); }}
+        >
+          🚀 ACELERAR
         </button>
       </div>
     </div>

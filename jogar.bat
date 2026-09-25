@@ -1,5 +1,5 @@
 @echo off
-title FLOWERY - Retro RPG Battle
-echo Iniciando FLOWERY no navegador...
+title TOP GEAR - Retro Racing 16-Bit
+echo Iniciando TOP GEAR no navegador...
 start "" "%~dp0jogar.html"
 exit

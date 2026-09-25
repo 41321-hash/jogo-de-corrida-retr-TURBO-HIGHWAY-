@@ -1,38 +1,55 @@
 import React, { useState, useEffect, useRef } from 'react';
 import CarCanvas from './components/CarCanvas';
-import Dashboard from './components/Dashboard';
+import { TopGearHeader, TopGearCockpit, TopGearPitStopModal } from './components/TopGearHUD';
+import CarSelectModal from './components/CarSelectModal';
 import TouchControls from './components/TouchControls';
 import { carAudio } from './utils/carAudio';
+import { TOP_GEAR_CARS, TRACK_THEMES } from './utils/roadEngine';
 
 export default function App() {
-  const [gameState, setGameState] = useState('MENU'); // MENU, PLAYING, GAME_OVER
-  const [gameOverReason, setGameOverReason] = useState('CRASH'); // CRASH ou OUT_OF_FUEL
+  const [gameState, setGameState] = useState('CAR_SELECT'); // CAR_SELECT, PLAYING, FINISHED, GAME_OVER
+  const [selectedCar, setSelectedCar] = useState('cannoli');
+  const [selectedTrack, setSelectedTrack] = useState('vegas');
+  const [transmission, setTransmission] = useState('auto');
   const [isMuted, setIsMuted] = useState(false);
 
-  // Status de Corrida
-  const [speed, setSpeed] = useState(0);
-  const [fuel, setFuel] = useState(100);
-  const [nitro, setNitro] = useState(60);
-  const [isNitroActive, setIsNitroActive] = useState(false);
-  const [score, setScore] = useState(0);
-  const [distance, setDistance] = useState(0);
-  const [highScore, setHighScore] = useState(0);
-  const [showNearMiss, setShowNearMiss] = useState(false);
-  const [isScreenShaking, setIsScreenShaking] = useState(false);
+  // Status transmitidos do Loop 3D para o HUD
+  const [hudData, setHudData] = useState({
+    speed: 0,
+    rpm: 0.2,
+    gear: 1,
+    fuel: 100,
+    nitroCount: 4,
+    isNitroActive: false,
+    rank: 20,
+    totalRacers: 20,
+    lap: 1,
+    totalLaps: 3,
+    lapTime: 0,
+    bestLapTime: null,
+    isPitStop: false
+  });
+
+  // Resultados Finais
+  const [raceResults, setRaceResults] = useState({
+    rank: 20,
+    totalTime: 0,
+    bestLap: 0,
+    qualified: false,
+    reason: ''
+  });
 
   // Inputs
   const keysPressed = useRef({});
-  const touchState = useRef({ left: false, right: false, accel: false, brake: false, nitro: false });
+  const touchState = useRef({
+    left: false,
+    right: false,
+    accel: false,
+    brake: false,
+    nitro: false
+  });
 
-  // Carregar recorde do localStorage
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem('turbo_drift_highscore');
-      if (saved) setHighScore(parseInt(saved, 10));
-    } catch (e) {}
-  }, []);
-
-  // Monitorar teclas de teclado
+  // Monitorar teclas do teclado
   useEffect(() => {
     const handleKeyDown = (e) => {
       keysPressed.current[e.code] = true;
@@ -41,6 +58,12 @@ export default function App() {
       // Buzina na tecla B ou H
       if ((e.code === 'KeyB' || e.code === 'KeyH') && gameState === 'PLAYING') {
         carAudio.playHorn();
+      }
+
+      // Mudo na tecla M
+      if (e.code === 'KeyM') {
+        const muted = carAudio.toggleMute();
+        setIsMuted(muted);
       }
     };
 
@@ -62,155 +85,214 @@ export default function App() {
     setIsMuted(muted);
   };
 
-  const startGame = () => {
+  const handleStartRace = () => {
     carAudio.init();
     carAudio.startEngine();
-    carAudio.startRaceBGM();
-
-    setSpeed(120);
-    setFuel(100);
-    setNitro(60);
-    setIsNitroActive(false);
-    setScore(0);
-    setDistance(0);
+    carAudio.startRaceBGM(selectedTrack);
     setGameState('PLAYING');
   };
 
-  const handleGameOver = (reason, finalScore, finalDist) => {
-    setGameOverReason(reason);
+  const handleRaceFinish = (finalRank, totalRaceTime, bestLapTime) => {
+    const qualified = finalRank <= 3;
+    setRaceResults({
+      rank: finalRank,
+      totalTime: totalRaceTime,
+      bestLap: bestLapTime,
+      qualified: qualified,
+      reason: qualified ? 'QUALIFIED FOR NEXT STAGE!' : 'FAILED TO QUALIFY (TOP 3 REQUIRED)'
+    });
+    setGameState('FINISHED');
+  };
+
+  const handleGameOver = (reason, rank, lap, totalRaceTime) => {
+    setRaceResults({
+      rank: rank,
+      totalTime: totalRaceTime,
+      bestLap: null,
+      qualified: false,
+      reason: reason === 'OUT_OF_FUEL' ? 'PANE SECA! COMBUSTÍVEL ESGOTADO!' : 'DISQUALIFIED'
+    });
     setGameState('GAME_OVER');
-    setIsScreenShaking(true);
-    setTimeout(() => setIsScreenShaking(false), 400);
-
-    carAudio.stopEngine();
-    carAudio.stopBGM();
-
-    if (finalScore > highScore) {
-      setHighScore(finalScore);
-      try {
-        localStorage.setItem('turbo_drift_highscore', finalScore.toString());
-      } catch (e) {}
-    }
   };
 
-  const triggerNearMiss = () => {
-    setShowNearMiss(true);
-    setTimeout(() => setShowNearMiss(false), 800);
+  const formatRaceTime = (seconds) => {
+    if (!seconds || seconds <= 0) return '00:00.00';
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    const ms = Math.floor((seconds % 1) * 100);
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}.${ms.toString().padStart(2, '0')}`;
   };
+
+  const currentCarDef = TOP_GEAR_CARS.find((c) => c.id === selectedCar) || TOP_GEAR_CARS[0];
+  const currentTrackDef = TRACK_THEMES[selectedTrack] || TRACK_THEMES.vegas;
 
   return (
-    <div className={`car-game-container ${isScreenShaking ? 'screen-shake' : ''}`}>
-      {/* Dashboard Superior */}
-      <Dashboard
-        score={score}
-        highScore={highScore}
-        distance={distance}
-        fuel={fuel}
-        nitro={nitro}
-        isMuted={isMuted}
-        onToggleSound={toggleSound}
-      />
-
-      {/* Área da Pista / Canvas */}
-      <div style={{ position: 'relative', flex: 1, display: 'flex', minHeight: 0 }}>
-        <CarCanvas
-          gameState={gameState}
-          speed={speed}
-          setSpeed={setSpeed}
-          fuel={fuel}
-          setFuel={setFuel}
-          nitro={nitro}
-          setNitro={setNitro}
-          isNitroActive={isNitroActive}
-          setIsNitroActive={setIsNitroActive}
-          score={score}
-          setScore={setScore}
-          distance={distance}
-          setDistance={setDistance}
-          keysPressed={keysPressed}
-          touchState={touchState}
-          onGameOver={handleGameOver}
-          onNearMiss={triggerNearMiss}
+    <div className="topgear-app-container">
+      {/* 1. SELEÇÃO DE CARRO E PISTA INICIAL */}
+      {gameState === 'CAR_SELECT' && (
+        <CarSelectModal
+          selectedCar={selectedCar}
+          setSelectedCar={setSelectedCar}
+          selectedTrack={selectedTrack}
+          setSelectedTrack={setSelectedTrack}
+          transmission={transmission}
+          setTransmission={setTransmission}
+          onStartRace={handleStartRace}
         />
+      )}
 
-        {/* Efeito Visual de Raspão (Near Miss) */}
-        {showNearMiss && (
-          <div className="near-miss-banner">
-            🔥 RASPÃO! +500 PTS 🔥
+      {/* 2. ESTRUTURA DO JOGO EM EXECUÇÃO (LAYOUT SEM SOBREPOSIÇÃO) */}
+      {gameState === 'PLAYING' && (
+        <div className="topgear-game-layout">
+          {/* A. Barra Superior Fixa: Posição, Volta, Cronômetro, Áudio */}
+          <TopGearHeader
+            rank={hudData.rank}
+            totalRacers={hudData.totalRacers}
+            lap={hudData.lap}
+            totalLaps={hudData.totalLaps}
+            lapTime={hudData.lapTime}
+            bestLapTime={hudData.bestLapTime}
+            isMuted={isMuted}
+            onToggleSound={toggleSound}
+          />
+
+          {/* B. Área Central do Canvas 3D (Flex: 1, visibilidade máxima) */}
+          <div className="topgear-canvas-area">
+            <CarCanvas
+              gameState={gameState}
+              selectedCarId={selectedCar}
+              selectedTrackId={selectedTrack}
+              transmission={transmission}
+              keysPressed={keysPressed}
+              touchState={touchState}
+              onHUDUpdate={setHudData}
+              onRaceFinish={handleRaceFinish}
+              onGameOver={handleGameOver}
+            />
+
+            {/* Modal de Reabastecimento no Pit Stop */}
+            <TopGearPitStopModal
+              isPitStop={hudData.isPitStop}
+              fuel={hudData.fuel}
+            />
           </div>
-        )}
 
-        {/* TELA DE MENU INICIAL */}
-        {gameState === 'MENU' && (
-          <div className="modal-overlay">
-            <h1 className="arcade-title">TURBO HIGHWAY</h1>
-            <div className="arcade-subtitle">RETRO RACING 8-BIT</div>
+          {/* C. Painel Inferior do Cockpit Fixo (Velocímetro, RPM, Nitros, Combustível) */}
+          <TopGearCockpit
+            speed={hudData.speed}
+            rpm={hudData.rpm}
+            gear={hudData.gear}
+            fuel={hudData.fuel}
+            nitroCount={hudData.nitroCount}
+            isNitroActive={hudData.isNitroActive}
+            transmission={transmission}
+          />
 
-            <div className="instructions-card">
-              <p><b>🕹️ CONTROLES (PC):</b></p>
-              <p>• <b>Setas ◀ ▶ ou A / D</b>: Virar o carro</p>
-              <p>• <b>Seta ▲ / W</b>: Acelerar mais rápido</p>
-              <p>• <b>Seta ▼ / S</b>: Frear</p>
-              <p>• <b>ESPAÇO ou SHIFT</b>: Ativar NITRO</p>
-              <p>• <b>B ou H</b>: Buzinar</p>
-              <p style={{ marginTop: '8px' }}><b>⛽ OBJETIVOS:</b></p>
-              <p>• Colete galões de gasolina (GAS) para não parar!</p>
-              <p>• Pegue moedas ($) e passe raspando para encher o Nitro!</p>
-              <p>• Cuidado com caminhões lentos e poças de óleo!</p>
-            </div>
+          {/* D. Barra de Controles Touch (Fixa na base, sem sobrepor o cockpit) */}
+          <TouchControls touchState={touchState} />
+        </div>
+      )}
 
-            <button
-              type="button"
-              className="arcade-btn-primary"
-              onClick={startGame}
+      {/* 3. TELA DE CHEGADA / PODIUM (FINISHED) */}
+      {gameState === 'FINISHED' && (
+        <div className="tg-modal-overlay">
+          <div className="tg-results-card">
+            <h1
+              className="tg-results-title"
+              style={{ color: raceResults.qualified ? '#facc15' : '#ef4444' }}
             >
-              INICIAR CORRIDA ▶
-            </button>
-          </div>
-        )}
-
-        {/* TELA DE GAME OVER */}
-        {gameState === 'GAME_OVER' && (
-          <div className="modal-overlay">
-            <h1 className="arcade-title" style={{ color: '#ef4444', textShadow: '0 0 20px #ef4444' }}>
-              {gameOverReason === 'CRASH' ? 'BATIDA!' : 'PANE SECA!'}
+              {raceResults.qualified ? '🏆 QUALIFIED! 🏆' : 'RACE FINISHED'}
             </h1>
-            <div className="arcade-subtitle" style={{ color: '#fca5a5' }}>
-              {gameOverReason === 'CRASH'
-                ? 'Seu carro colidiu no tráfego!'
-                : 'Seu combustível acabou no meio da rodovia!'}
-            </div>
+            <div className="tg-results-subtitle">{raceResults.reason}</div>
 
-            <div className="game-over-stats">
-              <div className="stat-row">
-                <span>PONTUAÇÃO FINAL:</span>
-                <span className="stat-row-value">{score}</span>
-              </div>
-              <div className="stat-row">
-                <span>DISTÂNCIA PERCORRIDA:</span>
-                <span className="stat-row-value">{Math.floor(distance)} metros</span>
-              </div>
-              <div className="stat-row">
-                <span>RECORDE (BEST):</span>
-                <span className="stat-row-value" style={{ color: '#ffe600' }}>
-                  {highScore}
+            <div className="tg-results-podium-box">
+              <div className="tg-podium-rank">
+                <span className="tg-podium-label">POSIÇÃO FINAL</span>
+                <span className="tg-podium-number" style={{ color: raceResults.qualified ? '#38bdf8' : '#ffffff' }}>
+                  {raceResults.rank}º / 20
                 </span>
               </div>
+
+              <div className="tg-results-data-table">
+                <div className="tg-data-row">
+                  <span>CIRCUITO:</span>
+                  <b>{currentTrackDef.name} ({currentTrackDef.country})</b>
+                </div>
+                <div className="tg-data-row">
+                  <span>CARRO:</span>
+                  <b style={{ color: currentCarDef.color }}>{currentCarDef.name}</b>
+                </div>
+                <div className="tg-data-row">
+                  <span>TEMPO TOTAL:</span>
+                  <b>{formatRaceTime(raceResults.totalTime)}</b>
+                </div>
+                <div className="tg-data-row">
+                  <span>MELHOR VOLTA:</span>
+                  <b style={{ color: '#4ade80' }}>
+                    {raceResults.bestLap ? formatRaceTime(raceResults.bestLap) : '--:--.--'}
+                  </b>
+                </div>
+              </div>
             </div>
 
-            <button
-              type="button"
-              className="arcade-btn-primary"
-              onClick={startGame}
-            >
-              CORRER NOVAMENTE 🔄
-            </button>
+            <div className="tg-results-actions">
+              <button
+                type="button"
+                className="tg-start-race-btn"
+                onClick={() => {
+                  carAudio.stopBGM();
+                  setGameState('CAR_SELECT');
+                }}
+              >
+                MENU PRINCIPAL / TROCAR CARRO 🔄
+              </button>
+            </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
-      {/* Controles Touch para Mobile */}
-      <TouchControls touchState={touchState} />
+      {/* 4. TELA DE GAME OVER (PANE SECA) */}
+      {gameState === 'GAME_OVER' && (
+        <div className="tg-modal-overlay">
+          <div className="tg-results-card" style={{ borderColor: '#ef4444' }}>
+            <h1 className="tg-results-title" style={{ color: '#ef4444' }}>
+              ⚠️ PANE SECA! ⚠️
+            </h1>
+            <div className="tg-results-subtitle">
+              Seu carro ficou sem combustível antes de entrar no Pit Stop!
+            </div>
+
+            <div className="tg-results-podium-box">
+              <div className="tg-results-data-table">
+                <div className="tg-data-row">
+                  <span>POSIÇÃO NO MOMENTO:</span>
+                  <b>{raceResults.rank}º LUGAR</b>
+                </div>
+                <div className="tg-data-row">
+                  <span>DICA TOP GEAR:</span>
+                  <b style={{ color: '#facc15' }}>
+                    Fique atento ao alerta "PIT IN" e entre na faixa do lado direito da pista para reabastecer!
+                  </b>
+                </div>
+              </div>
+            </div>
+
+            <div className="tg-results-actions">
+              <button
+                type="button"
+                className="tg-start-race-btn"
+                style={{ background: 'linear-gradient(135deg, #ef4444, #991b1b)' }}
+                onClick={() => {
+                  carAudio.stopBGM();
+                  setGameState('CAR_SELECT');
+                }}
+              >
+                TENTAR NOVAMENTE 🔄
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
