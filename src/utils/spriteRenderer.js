@@ -70,125 +70,194 @@ export function drawBackground(ctx, width, height, theme, skyOffset) {
   }
 }
 
-// Desenhar Carro do Jogador (Visão Traseira Top Gear com Inclinação e Chassi Pixel-Art)
+// Desenhar Carro do Jogador (Visão Traseira Turbo Highway Fiel à Imagem)
 export function drawPlayerCar(ctx, width, height, carDef, speedPercent, steer, isNitro, isBraking) {
-  const carWidth = Math.round(width * 0.22);
-  const carHeight = Math.round(carWidth * 0.62);
+  const carWidth = Math.round(width * 0.23);
+  const carHeight = Math.round(carWidth * 0.64);
   const carX = width / 2;
   const carY = height * 0.88;
 
   ctx.save();
   ctx.translate(carX, carY);
 
-  // Inclinação nas curvas (Body roll estilo Top Gear)
-  const roll = steer * 0.16;
+  // Inclinação nas curvas (Body roll dinâmico de arcade)
+  const roll = steer * 0.14;
   ctx.rotate(roll);
 
-  // Sombra sob o carro
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+  // Sombra suave sob o carro
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
   ctx.beginPath();
-  ctx.ellipse(0, carHeight * 0.35, carWidth * 0.58, carHeight * 0.2, 0, 0, Math.PI * 2);
+  ctx.ellipse(0, carHeight * 0.38, carWidth * 0.58, carHeight * 0.22, 0, 0, Math.PI * 2);
   ctx.fill();
 
   const halfW = carWidth / 2;
   const halfH = carHeight / 2;
 
-  // 1. Pneus Traseiros Largos com sulcos de borracha
-  ctx.fillStyle = '#0a0a0c';
+  // 1. Pneus Traseiros Largos de Competição
+  ctx.fillStyle = '#09090b';
   // Pneu Esquerdo
-  ctx.fillRect(-halfW + 4, halfH - 18, 18, 22);
+  ctx.fillRect(-halfW + 2, halfH - 20, 20, 24);
   // Pneu Direito
-  ctx.fillRect(halfW - 22, halfH - 18, 18, 22);
+  ctx.fillRect(halfW - 22, halfH - 20, 20, 24);
 
-  // Aros / Calotas esportivas
-  ctx.fillStyle = '#64748b';
-  ctx.fillRect(-halfW + 7, halfH - 12, 12, 10);
-  ctx.fillRect(halfW - 19, halfH - 12, 12, 10);
+  // Sulcos e Calotas esportivas
+  ctx.fillStyle = '#475569';
+  ctx.fillRect(-halfW + 5, halfH - 14, 14, 12);
+  ctx.fillRect(halfW - 19, halfH - 14, 14, 12);
 
-  // 2. Chassi do Carro (Linhas aerodinâmicas anos 90)
+  // 2. Retrovisores Laterais Proeminentes (Como no clássico da imagem!)
+  ctx.fillStyle = carDef.color;
+  // Retrovisor Esquerdo
+  ctx.fillRect(-halfW - 8, -halfH + 18, 10, 7);
+  ctx.strokeStyle = '#09090b';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(-halfW - 8, -halfH + 18, 10, 7);
+  ctx.fillStyle = '#38bdf8'; // Espelho reflexivo
+  ctx.fillRect(-halfW - 7, -halfH + 20, 3, 4);
+
+  // Retrovisor Direito
+  ctx.fillStyle = carDef.color;
+  ctx.fillRect(halfW - 2, -halfH + 18, 10, 7);
+  ctx.strokeRect(halfW - 2, -halfH + 18, 10, 7);
+  ctx.fillStyle = '#38bdf8';
+  ctx.fillRect(halfW + 4, -halfH + 20, 3, 4);
+
+  // 3. Chassi Principal e Carroceria Aerodinâmica
   ctx.fillStyle = carDef.color;
   ctx.beginPath();
   ctx.moveTo(-halfW + 8, halfH);
-  ctx.lineTo(-halfW + 2, 0);
-  ctx.lineTo(-halfW + 16, -halfH + 6);
-  ctx.lineTo(halfW - 16, -halfH + 6);
-  ctx.lineTo(halfW - 2, 0);
+  ctx.lineTo(-halfW + 2, -halfH + 16);
+  ctx.lineTo(-halfW + 18, -halfH + 2);
+  ctx.lineTo(halfW - 18, -halfH + 2);
+  ctx.lineTo(halfW - 2, -halfH + 16);
   ctx.lineTo(halfW - 8, halfH);
   ctx.closePath();
   ctx.fill();
 
-  // Borda preta retro no chassi
-  ctx.strokeStyle = '#09090b';
+  // Borda preta clássica pixel-art
+  ctx.strokeStyle = '#050505';
   ctx.lineWidth = 3;
   ctx.stroke();
 
-  // 3. Vidro Traseiro e Teto
-  ctx.fillStyle = carDef.glassColor || '#0f172a';
+  // 4. Vidro Traseiro com Moldura Escura
+  ctx.fillStyle = '#050508';
   ctx.beginPath();
-  ctx.moveTo(-halfW + 20, -halfH + 8);
-  ctx.lineTo(-halfW + 24, -halfH + 2);
-  ctx.lineTo(halfW - 24, -halfH + 2);
-  ctx.lineTo(halfW - 20, -halfH + 8);
+  ctx.moveTo(-halfW + 22, -halfH + 5);
+  ctx.lineTo(-halfW + 16, -halfH + 18);
+  ctx.lineTo(halfW - 16, -halfH + 18);
+  ctx.lineTo(halfW - 22, -halfH + 5);
   ctx.closePath();
   ctx.fill();
 
-  // Reflexo no vidro
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-  ctx.fillRect(-halfW + 28, -halfH + 3, halfW * 0.45, 4);
-
-  // 4. Aerofólio Traseiro Esportivo (Spoiler)
-  ctx.fillStyle = carDef.color;
-  ctx.fillRect(-halfW + 6, -halfH + 12, carWidth - 12, 6);
-  ctx.fillStyle = '#18181b';
-  ctx.fillRect(-halfW + 14, -halfH + 18, 6, 8);
-  ctx.fillRect(halfW - 20, -halfH + 18, 6, 8);
-
-  // 5. Faixa Esportiva / Detalhe
-  ctx.fillStyle = carDef.accentColor;
-  ctx.fillRect(-8, -halfH + 8, 16, carHeight * 0.65);
-
-  // 6. Placa Traseira e Nome "TOP GEAR"
-  ctx.fillStyle = '#18181b';
-  ctx.fillRect(-22, halfH - 12, 44, 11);
-  ctx.fillStyle = '#facc15';
-  ctx.font = 'bold 8px monospace';
-  ctx.textAlign = 'center';
-  ctx.fillText('TOP-GEAR', 0, halfH - 3);
-
-  // 7. Lanternas Traseiras (Top Gear Style)
-  const isLightOn = isBraking;
-  ctx.fillStyle = isLightOn ? '#ff0033' : '#991b1b';
-  ctx.fillRect(-halfW + 10, halfH - 14, 20, 7);
-  ctx.fillRect(halfW - 30, halfH - 14, 20, 7);
-
-  if (isLightOn) {
-    // Brilho dos freios
-    ctx.fillStyle = 'rgba(255, 0, 50, 0.4)';
+  // Persianas / Linhas Horizontais do Vidro Esportivo
+  ctx.strokeStyle = '#1e293b';
+  ctx.lineWidth = 1.5;
+  for (let l = 0; l < 3; l++) {
+    const ly = -halfH + 8 + l * 3.5;
     ctx.beginPath();
-    ctx.arc(-halfW + 20, halfH - 10, 14, 0, Math.PI * 2);
-    ctx.arc(halfW - 20, halfH - 10, 14, 0, Math.PI * 2);
+    ctx.moveTo(-halfW + 20 - l, ly);
+    ctx.lineTo(halfW - 20 + l, ly);
+    ctx.stroke();
+  }
+
+  // Reflexo de Luz no Vidro
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+  ctx.fillRect(-halfW + 26, -halfH + 7, halfW * 0.35, 3);
+
+  // 5. Faixa de Corrida Central Branca (Idêntica à imagem!)
+  const stripeW = 12;
+  ctx.fillStyle = carDef.accentColor || '#ffffff';
+  // Faixa no capô/teto
+  ctx.fillRect(-stripeW / 2, -halfH + 2, stripeW, 4);
+  // Faixa na tampa traseira até o para-choque
+  ctx.fillRect(-stripeW / 2, -halfH + 18, stripeW, carHeight * 0.58);
+  // Contorno fino da faixa
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(-stripeW / 2, -halfH + 18, stripeW, carHeight * 0.58);
+
+  // 6. Aerofólio / Spoiler Traseiro
+  ctx.fillStyle = carDef.color;
+  ctx.fillRect(-halfW + 4, -halfH + 16, carWidth - 8, 4);
+  ctx.strokeStyle = '#000000';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(-halfW + 4, -halfH + 16, carWidth - 8, 4);
+
+  // 7. Lanternas Traseiras Retangulares Bicolores (Vermelho + Âmbar)
+  const isLightOn = isBraking;
+  const lightW = 24;
+  const lightH = 9;
+
+  // Lanterna Esquerda
+  const leftLX = -halfW + 10;
+  const leftLY = halfH - 16;
+  // Parte interna (Seta / Âmbar)
+  ctx.fillStyle = '#f97316';
+  ctx.fillRect(leftLX + lightW - 8, leftLY, 8, lightH);
+  // Parte externa (Freio / Vermelho)
+  ctx.fillStyle = isLightOn ? '#ff0033' : '#b91c1c';
+  ctx.fillRect(leftLX, leftLY, lightW - 8, lightH);
+  ctx.strokeStyle = '#000000';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(leftLX, leftLY, lightW, lightH);
+
+  // Lanterna Direita
+  const rightLX = halfW - 10 - lightW;
+  const rightLY = halfH - 16;
+  // Parte interna (Seta / Âmbar)
+  ctx.fillStyle = '#f97316';
+  ctx.fillRect(rightLX, rightLY, 8, lightH);
+  // Parte externa (Freio / Vermelho)
+  ctx.fillStyle = isLightOn ? '#ff0033' : '#b91c1c';
+  ctx.fillRect(rightLX + 8, rightLY, lightW - 8, lightH);
+  ctx.strokeStyle = '#000000';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(rightLX, rightLY, lightW, lightH);
+
+  // Brilho intenso de freio
+  if (isLightOn) {
+    ctx.fillStyle = 'rgba(255, 0, 50, 0.45)';
+    ctx.beginPath();
+    ctx.arc(leftLX + 8, leftLY + 4, 16, 0, Math.PI * 2);
+    ctx.arc(rightLX + lightW - 8, rightLY + 4, 16, 0, Math.PI * 2);
     ctx.fill();
   }
 
-  // 8. Escapamentos Duplos
-  ctx.fillStyle = '#27272a';
-  ctx.fillRect(-halfW + 16, halfH - 2, 8, 5);
-  ctx.fillRect(halfW - 24, halfH - 2, 8, 5);
+  // 8. Placa Traseira Amarela "TURBO-HW"
+  ctx.fillStyle = '#09090b';
+  ctx.fillRect(-20, halfH - 13, 40, 11);
+  ctx.fillStyle = '#facc15'; // Fundo amarelo neon da placa
+  ctx.fillRect(-18, halfH - 12, 36, 9);
+  ctx.fillStyle = '#09090b'; // Letras pretas
+  ctx.font = '900 7px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('TURBO-HW', 0, halfH - 5);
 
-  // 9. FOGO DO NITRO / TURBO!
+  // 9. Difusor Traseiro e Escapamentos Duplos
+  ctx.fillStyle = '#18181b';
+  ctx.fillRect(-halfW + 12, halfH - 4, carWidth - 24, 6);
+  // Tubos de escape
+  ctx.fillStyle = '#cbd5e1';
+  ctx.fillRect(-halfW + 16, halfH - 3, 7, 5);
+  ctx.fillRect(halfW - 23, halfH - 3, 7, 5);
+  ctx.fillStyle = '#09090b';
+  ctx.fillRect(-halfW + 17, halfH - 1, 5, 3);
+  ctx.fillRect(halfW - 22, halfH - 1, 5, 3);
+
+  // 10. Chamas Turbo Nitro
   if (isNitro) {
-    [-halfW + 20, halfW - 20].forEach((exX) => {
-      const flameLen = 18 + Math.random() * 22;
+    [-halfW + 19, halfW - 20].forEach((exX) => {
+      const flameLen = 22 + Math.random() * 26;
       const gradF = ctx.createLinearGradient(exX, halfH + 2, exX, halfH + 2 + flameLen);
       gradF.addColorStop(0, '#ffffff');
-      gradF.addColorStop(0.3, '#38bdf8');
-      gradF.addColorStop(0.7, '#06b6d4');
-      gradF.addColorStop(1, 'rgba(0, 200, 255, 0)');
+      gradF.addColorStop(0.2, '#38bdf8');
+      gradF.addColorStop(0.6, '#ec4899');
+      gradF.addColorStop(1, 'rgba(236, 72, 153, 0)');
 
       ctx.fillStyle = gradF;
       ctx.beginPath();
-      ctx.moveTo(exX - 6, halfH + 2);
-      ctx.lineTo(exX + 6, halfH + 2);
+      ctx.moveTo(exX - 7, halfH + 2);
+      ctx.lineTo(exX + 7, halfH + 2);
       ctx.lineTo(exX, halfH + 2 + flameLen);
       ctx.closePath();
       ctx.fill();
@@ -198,7 +267,7 @@ export function drawPlayerCar(ctx, width, height, carDef, speedPercent, steer, i
   ctx.restore();
 }
 
-// Desenhar Carro Rival da CPU em 3D (roadW = largura em pixels da pista naquele ponto)
+// Desenhar Carro Rival da CPU em 3D
 export function drawRivalCar(ctx, x, y, roadW, car) {
   // Tamanho do carro proporcional à largura da pista na tela
   const w = Math.round(roadW * 0.52);  // carro ocupa ~52% da meia-pista
@@ -218,7 +287,7 @@ export function drawRivalCar(ctx, x, y, roadW, car) {
   const hw = w / 2;
   const hh = h / 2;
 
-  // Pneus (vistos de trás)
+  // Pneus
   ctx.fillStyle = '#111111';
   ctx.fillRect(-hw - 2, hh * 0.3, hw * 0.25, hh * 0.7);
   ctx.fillRect(hw - hw * 0.25 + 2, hh * 0.3, hw * 0.25, hh * 0.7);
@@ -250,12 +319,15 @@ export function drawRivalCar(ctx, x, y, roadW, car) {
   ctx.closePath();
   ctx.fill();
 
-  // Lanternas traseiras vermelhas
+  // Lanternas traseiras bicolores
   ctx.fillStyle = '#ff2222';
-  ctx.fillRect(-hw + 3, hh * 0.15, hw * 0.3, hh * 0.22);
-  ctx.fillRect(hw - hw * 0.3 - 3, hh * 0.15, hw * 0.3, hh * 0.22);
+  ctx.fillRect(-hw + 3, hh * 0.15, hw * 0.2, hh * 0.22);
+  ctx.fillRect(hw - hw * 0.2 - 3, hh * 0.15, hw * 0.2, hh * 0.22);
+  ctx.fillStyle = '#f97316';
+  ctx.fillRect(-hw + 3 + hw * 0.2, hh * 0.15, hw * 0.1, hh * 0.22);
+  ctx.fillRect(hw - hw * 0.3 - 3, hh * 0.15, hw * 0.1, hh * 0.22);
 
-  // Nome do rival (só quando grande o suficiente)
+  // Nome do rival
   if (w > 20) {
     ctx.fillStyle = '#18181b';
     ctx.fillRect(-w * 0.22, -hh * 0.05, w * 0.44, hh * 0.4);
@@ -273,8 +345,8 @@ export function drawRoadsideSprite(ctx, x, y, scale, spriteType) {
   ctx.save();
   ctx.translate(x, y);
 
-  if (spriteType === 'billboard_topgear') {
-    const w = Math.round(360 * scale);
+  if (spriteType === 'billboard_turbo' || spriteType === 'billboard_topgear') {
+    const w = Math.round(380 * scale);
     const h = Math.round(180 * scale);
     if (w < 4) { ctx.restore(); return; }
 
@@ -283,23 +355,23 @@ export function drawRoadsideSprite(ctx, x, y, scale, spriteType) {
     ctx.fillRect(-w * 0.35, 0, Math.max(2, w * 0.08), h * 0.8);
     ctx.fillRect(w * 0.27, 0, Math.max(2, w * 0.08), h * 0.8);
 
-    // Painel do Outdoor
-    ctx.fillStyle = '#e11d48';
+    // Painel do Outdoor Estilo Synthwave
+    ctx.fillStyle = '#0f172a';
     ctx.fillRect(-w / 2, -h, w, h);
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = Math.max(1, 2 * scale);
+    ctx.strokeStyle = '#06b6d4';
+    ctx.lineWidth = Math.max(1, 3 * scale);
     ctx.strokeRect(-w / 2, -h, w, h);
 
-    // Texto TOP GEAR no outdoor
+    // Logo TURBO HIGHWAY no outdoor
     if (scale > 0.002) {
       ctx.fillStyle = '#facc15';
-      ctx.font = `italic 900 ${Math.max(9, Math.round(36 * scale))}px sans-serif`;
+      ctx.font = `italic 900 ${Math.max(9, Math.round(34 * scale))}px sans-serif`;
       ctx.textAlign = 'center';
-      ctx.fillText('TOP GEAR', 0, -h * 0.45);
+      ctx.fillText('TURBO', 0, -h * 0.55);
 
-      ctx.fillStyle = '#ffffff';
-      ctx.font = `bold ${Math.max(7, Math.round(16 * scale))}px sans-serif`;
-      ctx.fillText('CHAMPIONSHIP', 0, -h * 0.18);
+      ctx.fillStyle = '#ec4899';
+      ctx.font = `bold 900 ${Math.max(8, Math.round(24 * scale))}px sans-serif`;
+      ctx.fillText('HIGHWAY', 0, -h * 0.22);
     }
   } else if (spriteType === 'gantry_finish') {
     // Pórtico de Linha de Chegada que cruza a pista inteira

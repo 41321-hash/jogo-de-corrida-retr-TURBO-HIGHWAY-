@@ -26,6 +26,8 @@ export default function CarCanvas({
   selectedCarId,
   selectedTrackId,
   transmission,
+  customColor,
+  customAccent,
   keysPressed,
   touchState,
   onHUDUpdate,
@@ -37,8 +39,13 @@ export default function CarCanvas({
   const lastTimeRef = useRef(performance.now());
 
   // Dados do Carro e Pista selecionados
-  const carDef =
+  const baseCarDef =
     TOP_GEAR_CARS.find((c) => c.id === selectedCarId) || TOP_GEAR_CARS[0];
+  const carDef = {
+    ...baseCarDef,
+    color: customColor || baseCarDef.color,
+    accentColor: customAccent || baseCarDef.accentColor,
+  };
   const trackTheme = TRACK_THEMES[selectedTrackId] || TRACK_THEMES.vegas;
 
   // Estados Físicos Mutáveis (Refs de Alto Desempenho 60 FPS)
@@ -295,13 +302,17 @@ export default function CarCanvas({
       const steerFactor = (player.speed / 240) * 1.85 * carDef.handling;
       player.x += steerInput * steerFactor * dt;
 
-      // Deslocamento centrífugo da curva da pista
-      const curveForce = currentSegment ? currentSegment.curve : 0;
-      player.x -= curveForce * (player.speed / 280) * 1.4 * dt;
+      // Deslocamento centrífugo suave da curva da pista
+      const segPercent = (((player.z % SEGMENT_LENGTH) + SEGMENT_LENGTH) % SEGMENT_LENGTH) / SEGMENT_LENGTH;
+      const nextSeg = segments[(startPos + 1) % segments.length];
+      const curCurve = currentSegment ? currentSegment.curve : 0;
+      const nxtCurve = nextSeg ? nextSeg.curve : curCurve;
+      const smoothCurve = curCurve * (1 - segPercent) + nxtCurve * segPercent;
+      player.x -= smoothCurve * (player.speed / 280) * 0.95 * dt;
 
       // Som de derrapagem ao fazer curvas fechadas em alta velocidade
       if (
-        Math.abs(curveForce) > 1.8 &&
+        Math.abs(smoothCurve) > 1.8 &&
         player.speed > 160 &&
         Math.random() < 0.08
       ) {
@@ -420,8 +431,9 @@ export default function CarCanvas({
       const camX = player.x * ROAD_WIDTH;
       const camZ = player.z - 350; // Câmera 350 unidades atrás do carro
 
+      const segProgress = (((player.z % SEGMENT_LENGTH) + SEGMENT_LENGTH) % SEGMENT_LENGTH) / SEGMENT_LENGTH;
+      let accumulatedDx = -(playerSegment ? playerSegment.curve * segProgress * 0.35 : 0);
       let accumulatedX = 0;
-      let accumulatedDx = 0;
 
       // 1ª Passada: Projetar todos os segmentos à frente e guardar o desvio X acumulado por segmento
       const projected = [];
@@ -433,7 +445,7 @@ export default function CarCanvas({
         const loopOffset = startPos + n >= segments.length ? trackLength : 0;
 
         accumulatedX += accumulatedDx;
-        accumulatedDx += segment.curve * 0.11;
+        accumulatedDx += segment.curve * 0.35;
         segAccX[n] = accumulatedX;
 
         // Ponto 1 (Início do Segmento)

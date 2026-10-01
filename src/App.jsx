@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import TitleScreen from './components/TitleScreen';
 import CarCanvas from './components/CarCanvas';
 import { TopGearHeader, TopGearCockpit, TopGearPitStopModal } from './components/TopGearHUD';
 import CarSelectModal from './components/CarSelectModal';
@@ -7,10 +8,12 @@ import { carAudio } from './utils/carAudio';
 import { TOP_GEAR_CARS, TRACK_THEMES } from './utils/roadEngine';
 
 export default function App() {
-  const [gameState, setGameState] = useState('CAR_SELECT'); // CAR_SELECT, PLAYING, FINISHED, GAME_OVER
+  const [gameState, setGameState] = useState('TITLE'); // TITLE, CAR_SELECT, PLAYING, FINISHED, GAME_OVER
   const [selectedCar, setSelectedCar] = useState('cannoli');
   const [selectedTrack, setSelectedTrack] = useState('vegas');
   const [transmission, setTransmission] = useState('auto');
+  const [customColor, setCustomColor] = useState(null);
+  const [customAccent, setCustomAccent] = useState(null);
   const [isMuted, setIsMuted] = useState(false);
 
   // Status transmitidos do Loop 3D para o HUD
@@ -123,12 +126,24 @@ export default function App() {
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}.${ms.toString().padStart(2, '0')}`;
   };
 
-  const currentCarDef = TOP_GEAR_CARS.find((c) => c.id === selectedCar) || TOP_GEAR_CARS[0];
+  const baseCarDef = TOP_GEAR_CARS.find((c) => c.id === selectedCar) || TOP_GEAR_CARS[0];
+  const currentCarDef = {
+    ...baseCarDef,
+    color: customColor || baseCarDef.color,
+    accentColor: customAccent || baseCarDef.accentColor
+  };
   const currentTrackDef = TRACK_THEMES[selectedTrack] || TRACK_THEMES.vegas;
 
   return (
     <div className="topgear-app-container">
-      {/* 1. SELEÇÃO DE CARRO E PISTA INICIAL */}
+      {/* 1. TELA DE ABERTURA RETRÔ TURBO HIGHWAY */}
+      {gameState === 'TITLE' && (
+        <TitleScreen
+          onStartGame={() => setGameState('CAR_SELECT')}
+        />
+      )}
+
+      {/* 2. SELEÇÃO DE CARRO E PISTA */}
       {gameState === 'CAR_SELECT' && (
         <CarSelectModal
           selectedCar={selectedCar}
@@ -137,11 +152,16 @@ export default function App() {
           setSelectedTrack={setSelectedTrack}
           transmission={transmission}
           setTransmission={setTransmission}
+          customColor={customColor}
+          setCustomColor={setCustomColor}
+          customAccent={customAccent}
+          setCustomAccent={setCustomAccent}
           onStartRace={handleStartRace}
+          onBackToTitle={() => setGameState('TITLE')}
         />
       )}
 
-      {/* 2. ESTRUTURA DO JOGO EM EXECUÇÃO (LAYOUT SEM SOBREPOSIÇÃO) */}
+      {/* 3. ESTRUTURA DO JOGO EM EXECUÇÃO */}
       {gameState === 'PLAYING' && (
         <div className="topgear-game-layout">
           {/* A. Barra Superior Fixa: Posição, Volta, Cronômetro, Áudio */}
@@ -156,13 +176,15 @@ export default function App() {
             onToggleSound={toggleSound}
           />
 
-          {/* B. Área Central do Canvas 3D (Flex: 1, visibilidade máxima) */}
+          {/* B. Área Central do Canvas 3D */}
           <div className="topgear-canvas-area">
             <CarCanvas
               gameState={gameState}
               selectedCarId={selectedCar}
               selectedTrackId={selectedTrack}
               transmission={transmission}
+              customColor={customColor}
+              customAccent={customAccent}
               keysPressed={keysPressed}
               touchState={touchState}
               onHUDUpdate={setHudData}
@@ -177,7 +199,7 @@ export default function App() {
             />
           </div>
 
-          {/* C. Painel Inferior do Cockpit Fixo (Velocímetro, RPM, Nitros, Combustível) */}
+          {/* C. Painel Inferior do Cockpit Fixo */}
           <TopGearCockpit
             speed={hudData.speed}
             rpm={hudData.rpm}
@@ -188,12 +210,12 @@ export default function App() {
             transmission={transmission}
           />
 
-          {/* D. Barra de Controles Touch (Fixa na base, sem sobrepor o cockpit) */}
+          {/* D. Barra de Controles Touch */}
           <TouchControls touchState={touchState} />
         </div>
       )}
 
-      {/* 3. TELA DE CHEGADA / PODIUM (FINISHED) */}
+      {/* 4. TELA DE CHEGADA / PODIUM (FINISHED) */}
       {gameState === 'FINISHED' && (
         <div className="tg-modal-overlay">
           <div className="tg-results-card">
@@ -219,7 +241,7 @@ export default function App() {
                   <b>{currentTrackDef.name} ({currentTrackDef.country})</b>
                 </div>
                 <div className="tg-data-row">
-                  <span>CARRO:</span>
+                  <span>MÁQUINA:</span>
                   <b style={{ color: currentCarDef.color }}>{currentCarDef.name}</b>
                 </div>
                 <div className="tg-data-row">
@@ -235,23 +257,35 @@ export default function App() {
               </div>
             </div>
 
-            <div className="tg-results-actions">
+            <div className="tg-results-actions" style={{ display: 'flex', gap: '8px' }}>
               <button
                 type="button"
                 className="tg-start-race-btn"
+                style={{ flex: '1', background: '#334155' }}
+                onClick={() => {
+                  carAudio.stopBGM();
+                  setGameState('TITLE');
+                }}
+              >
+                MENU PRINCIPAL 🏁
+              </button>
+              <button
+                type="button"
+                className="tg-start-race-btn"
+                style={{ flex: '1' }}
                 onClick={() => {
                   carAudio.stopBGM();
                   setGameState('CAR_SELECT');
                 }}
               >
-                MENU PRINCIPAL / TROCAR CARRO 🔄
+                TROCAR CARRO / PISTA 🔄
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* 4. TELA DE GAME OVER (PANE SECA) */}
+      {/* 5. TELA DE GAME OVER (PANE SECA) */}
       {gameState === 'GAME_OVER' && (
         <div className="tg-modal-overlay">
           <div className="tg-results-card" style={{ borderColor: '#ef4444' }}>
@@ -269,7 +303,7 @@ export default function App() {
                   <b>{raceResults.rank}º LUGAR</b>
                 </div>
                 <div className="tg-data-row">
-                  <span>DICA TOP GEAR:</span>
+                  <span>DICA TURBO HIGHWAY:</span>
                   <b style={{ color: '#facc15' }}>
                     Fique atento ao alerta "PIT IN" e entre na faixa do lado direito da pista para reabastecer!
                   </b>
@@ -277,11 +311,22 @@ export default function App() {
               </div>
             </div>
 
-            <div className="tg-results-actions">
+            <div className="tg-results-actions" style={{ display: 'flex', gap: '8px' }}>
               <button
                 type="button"
                 className="tg-start-race-btn"
-                style={{ background: 'linear-gradient(135deg, #ef4444, #991b1b)' }}
+                style={{ flex: '1', background: '#334155' }}
+                onClick={() => {
+                  carAudio.stopBGM();
+                  setGameState('TITLE');
+                }}
+              >
+                MENU PRINCIPAL 🏁
+              </button>
+              <button
+                type="button"
+                className="tg-start-race-btn"
+                style={{ flex: '1', background: 'linear-gradient(135deg, #ef4444, #991b1b)' }}
                 onClick={() => {
                   carAudio.stopBGM();
                   setGameState('CAR_SELECT');

@@ -3,7 +3,7 @@
 
 export const SEGMENT_LENGTH = 200; // Comprimento de cada fatia da pista
 export const ROAD_WIDTH = 2000;     // Largura padrão da pista no mundo 3D
-export const DRAW_DISTANCE = 220;   // Quantidade de segmentos visíveis à frente (estável e rápido)
+export const DRAW_DISTANCE = 320;   // Quantidade de segmentos visíveis à frente (maior alcance para avistar curvas com clareza)
 export const CAMERA_HEIGHT = 1000;  // Altura da câmera acima da pista
 export const CAMERA_DEPTH = 0.84;   // Distância focal da câmera
 export const TOTAL_LAPS = 3;        // Voltas da corrida
@@ -12,29 +12,29 @@ export const TOTAL_LAPS = 3;        // Voltas da corrida
 export const TRACK_THEMES = {
   vegas: {
     id: 'vegas',
-    name: 'LAS VEGAS',
+    name: 'LAS VEGAS HIGHWAY',
     country: 'USA 🇺🇸',
     skyGradient: ['#090514', '#1d0b38', '#4b1552', '#9b235e'],
     sunColor: '#ff2a85',
     horizonType: 'city',
-    roadDark: '#2c2e3e',       // Asfalto cinza escuro visível
-    roadLight: '#393c50',      // Asfalto cinza claro visível
-    rumble1: '#e11d48',        // Zebra vermelha
+    roadDark: '#242533',       // Asfalto escuro
+    roadLight: '#323447',      // Asfalto claro visível
+    rumble1: '#e11d48',        // Zebra vermelha neon
     rumble2: '#ffffff',        // Zebra branca
-    grassDark: '#120f26',      // Terreno noturno arroxeado
-    grassLight: '#1b1737',     // Terreno noturno iluminado
+    grassDark: '#100c22',      // Terreno noturno arroxeado
+    grassLight: '#181433',     // Terreno noturno iluminado
     laneColor: '#facc15',      // Faixa central amarela
     pitColor: '#1e293b'
   },
   rio: {
     id: 'rio',
-    name: 'RIO DE JANEIRO',
+    name: 'RIO COASTLINE',
     country: 'BRAZIL 🇧🇷',
     skyGradient: ['#0f172a', '#3b0764', '#b91c1c', '#f97316', '#fde047'],
     sunColor: '#fef08a',
     horizonType: 'mountains',
-    roadDark: '#32373e',
-    roadLight: '#3f454e',
+    roadDark: '#2c3138',
+    roadLight: '#3a4049',
     rumble1: '#16a34a',        // Zebra verde
     rumble2: '#facc15',        // Zebra amarela
     grassDark: '#14532d',      // Grama tropical
@@ -49,90 +49,90 @@ export const TRACK_THEMES = {
     skyGradient: ['#0f172a', '#1e293b', '#334155', '#64748b'],
     sunColor: '#cbd5e1',
     horizonType: 'forest',
-    roadDark: '#374151',
-    roadLight: '#4b5563',
+    roadDark: '#323a47',
+    roadLight: '#434e5e',
     rumble1: '#dc2626',
     rumble2: '#f8fafc',
-    grassDark: '#14371e',
-    grassLight: '#1f4e2c',
+    grassDark: '#12301a',
+    grassLight: '#1a4425',
     laneColor: '#e2e8f0',
     pitColor: '#111827'
   },
   tokyo: {
     id: 'tokyo',
-    name: 'TOKYO NIGHTLINE',
+    name: 'TOKYO EXPRESSWAY',
     country: 'JAPAN 🇯🇵',
     skyGradient: ['#050811', '#120f2e', '#2c124d', '#701a75'],
     sunColor: '#ec4899',
     horizonType: 'cyberpunk',
-    roadDark: '#232334',
-    roadLight: '#313148',
+    roadDark: '#1f1f2e',
+    roadLight: '#2c2c40',
     rumble1: '#06b6d4',        // Zebra ciano néon
     rumble2: '#ec4899',        // Zebra magenta néon
-    grassDark: '#0e111f',
-    grassLight: '#15192c',
+    grassDark: '#0c0e1a',
+    grassLight: '#131626',
     laneColor: '#38bdf8',
     pitColor: '#0a0a14'
   }
 };
 
-// Carros clássicos do Top Gear SNES
+// Carros esportivos retrô de Turbo Highway
 export const TOP_GEAR_CARS = [
   {
     id: 'cannoli',
-    name: 'THE CANNOLI',
-    color: '#e11d48', // Vermelho Icônico
+    name: 'RED TURBO',
+    color: '#e11d48', // Vermelho Icônico Turbo Highway
     accentColor: '#ffffff',
     glassColor: '#0f172a',
-    maxSpeed: 275,
+    maxSpeed: 280,
     accel: 1.15,
-    handling: 1.1,
+    handling: 1.15,
     fuelConsumption: 1.0,
-    nitroBoost: 65,
+    nitroBoost: 70,
     nitros: 4,
-    description: 'O clássico supercarro vermelho de Top Gear. Excelente equilíbrio de velocidade, aceleração e estabilidade.'
+    description: 'O lendário esportivo vermelho da capa de Turbo Highway! Equilíbrio cirúrgico entre velocidade máxima, controle e aceleração turbo.'
   },
   {
     id: 'sidewinder',
-    name: 'SIDEWINDER',
+    name: 'WHITE LIGHTNING',
     color: '#f8fafc', // Branco Perolizado
     accentColor: '#dc2626',
     glassColor: '#0284c7',
-    maxSpeed: 305,
+    maxSpeed: 310,
     accel: 0.95,
-    handling: 0.9,
+    handling: 0.92,
     fuelConsumption: 1.35,
-    nitroBoost: 80,
+    nitroBoost: 85,
     nitros: 4,
-    description: 'Velocidade máxima avassaladora nas retas. Consome mais combustível, perfeito para pilotos audaciosos!'
+    description: 'Velocidade final astronômica para dominar as longas retas da autoestrada. Consome mais combustível.'
   },
   {
     id: 'weasel',
-    name: 'PURPLE WEASEL',
-    color: '#9333ea', // Roxo Top Gear
+    name: 'SYNTH WEASEL',
+    color: '#9333ea', // Roxo Neon Synthwave
     accentColor: '#fbbf24',
     glassColor: '#1e1b4b',
-    maxSpeed: 265,
+    maxSpeed: 270,
     accel: 1.25,
-    handling: 1.35,
+    handling: 1.38,
     fuelConsumption: 0.75,
-    nitroBoost: 55,
+    nitroBoost: 60,
     nitros: 4,
-    description: 'Grip impressionante nas curvas e economia de combustível notável. Raramente precisa parar no Pit Stop.'
+    description: 'Controle impecável nas curvas mais longas e consumo supereconômico de combustível. Quase não visita o pit stop.'
   },
   {
     id: 'razor',
     name: 'CYBER RAZOR',
-    color: '#06b6d4', // Ciano / Azul Elétrico
+    color: '#06b6d4', // Ciano Elétrico
     accentColor: '#f43f5e',
     glassColor: '#082f49',
-    maxSpeed: 285,
-    accel: 1.2,
-    handling: 1.15,
+    maxSpeed: 290,
+    accel: 1.22,
+    handling: 1.18,
     fuelConsumption: 1.05,
-    nitroBoost: 70,
+    nitroBoost: 75,
     nitros: 4,
-    description: 'Resposta de aceleração turbo e controle de curvas ultra ágil. A máquina definitiva das pistas urbanas.'
+    description: 'Aceleração brutal e respostas instantâneas no volante. A máquina definitiva do asfalto urbano.'
   }
 ];
 
@@ -150,7 +150,7 @@ export const CPU_CAR_COLORS = [
   '#f97316', '#e2e8f0', '#64748b', '#a855f7'
 ];
 
-// Construtor de Pistas Customizadas
+// Construtor de Pistas com Curvas Longas, Fluidas e Visíveis à Distância
 export function buildTrack(trackId = 'vegas') {
   const segments = [];
 
@@ -200,45 +200,35 @@ export function buildTrack(trackId = 'vegas') {
     }
   }
 
-  // Gera traçados equilibrados onde o relevo é suave e o circuito fecha perfeitamente em Y = 0
+  // Gera traçados com menos curvas e retas longas de alta velocidade (estilo Autoestrada / TURBO HIGHWAY)
   if (trackId === 'vegas') {
-    // Las Vegas: Retas velozes, chicanes neon e Pit Stop
-    addRoad(40, 60, 40, 0, 0);          // Reta de largada
-    addRoad(30, 45, 30, 1.8, 300);      // Curva aberta à direita com subida leve
-    addRoad(25, 40, 25, -1.6, -300);    // Curva à esquerda descendo
-    addRoad(40, 70, 40, 0, 0);          // Reta dos cassinos
-    addRoad(25, 40, 25, -2.0, 250);     // Curva fechada para esquerda
-    addRoad(30, 45, 30, 1.9, -250);     // Curva para a direita
-    addRoad(40, 60, 40, 0, 0);          // Reta final
+    // Las Vegas Highway: Retas longas de alta velocidade pontuadas por 2 curvas amplas e panorâmicas
+    addRoad(60, 200, 60, 0, 0);          // Longa reta de largada
+    addRoad(70, 150, 70, 1.8, 120);      // 1ª Curva: Longa, gradual e ampla para a direita
+    addRoad(60, 220, 60, 0, -60);        // Longa reta dos cassinos (ideal para atingir velocidade máxima e nitro)
+    addRoad(70, 150, 70, -1.9, -60);     // 2ª Curva: Longa e suave para a esquerda
+    addRoad(60, 180, 60, 0, 0);          // Reta final com área de boxes e pórtico de chegada
   } else if (trackId === 'rio') {
-    // Rio de Janeiro: Curvas litorâneas e morros tropicais suaves
-    addRoad(30, 40, 30, 0, 0);
-    addRoad(35, 50, 35, -2.2, 450);     // Subida de morro
-    addRoad(30, 40, 30, 2.0, -450);     // Descida
-    addRoad(25, 35, 25, 2.4, 250);      // Curva à beira mar
-    addRoad(30, 50, 30, 0, -250);
-    addRoad(25, 40, 25, -2.3, 0);
-    addRoad(35, 60, 35, 1.5, 0);
-    addRoad(40, 60, 40, 0, 0);
+    // Rio Coastline: Retas litorâneas longas com 2 grandes curvas oceânicas
+    addRoad(60, 180, 60, 0, 0);          // Reta litorânea de largada
+    addRoad(80, 160, 80, 1.9, 180);      // Curva ampla contornando a orla
+    addRoad(60, 200, 60, 0, -180);       // Reta do túnel e serra
+    addRoad(80, 160, 80, -1.8, 0);       // Curva panorâmica suave para a esquerda
+    addRoad(60, 160, 60, 0, 0);          // Reta final de chegada
   } else if (trackId === 'frankfurt') {
-    // Frankfurt: Autobahn, retas longas com suaves ondulações
-    addRoad(50, 90, 50, 0, 0);
-    addRoad(30, 40, 30, 1.2, 350);
-    addRoad(30, 40, 30, 0, -350);
-    addRoad(35, 45, 35, -1.4, 300);
-    addRoad(35, 45, 35, 0, -300);
-    addRoad(45, 80, 45, 1.5, 0);
-    addRoad(40, 70, 40, 0, 0);
+    // Frankfurt Autobahn: A lendária autoestrada alemã, retas gigantescas para ultrapassar os 300 km/h
+    addRoad(80, 260, 80, 0, 0);          // Super reta Autobahn
+    addRoad(70, 160, 70, 1.4, 100);      // Curva ampla de alta velocidade para a direita
+    addRoad(80, 240, 80, 0, -100);       // Segunda super reta do vale
+    addRoad(70, 160, 70, -1.4, 0);       // Curva ampla de retorno à esquerda
+    addRoad(70, 180, 70, 0, 0);          // Reta final veloz
   } else {
-    // Tokyo: Chicanes rápidas estilo arcade
-    addRoad(30, 40, 30, 0, 0);
-    addRoad(20, 30, 20, 2.2, 150);
-    addRoad(20, 30, 20, -2.2, -150);
-    addRoad(25, 35, 25, 2.0, 0);
-    addRoad(35, 55, 35, 0, 0);
-    addRoad(20, 30, 20, -2.4, 200);
-    addRoad(25, 35, 25, 1.9, -200);
-    addRoad(40, 60, 40, 0, 0);
+    // Tokyo Expressway: Autoestrada expressa com retas amplas e 2 curvas urbanas estilosas
+    addRoad(60, 180, 60, 0, 0);          // Reta da ponte da baía
+    addRoad(70, 140, 70, 1.8, 80);       // Curva ampla iluminada em néon à direita
+    addRoad(60, 200, 60, 0, -80);        // Longa reta elevada
+    addRoad(70, 140, 70, -1.8, 0);       // Curva ampla à esquerda
+    addRoad(60, 160, 60, 0, 0);          // Reta final de alta velocidade
   }
 
   // Marcar a linha de chegada (Finish Line) nos primeiros 4 segmentos
@@ -246,9 +236,9 @@ export function buildTrack(trackId = 'vegas') {
     if (segments[i]) segments[i].isFinishLine = true;
   }
 
-  // Criar Área de Pit Stop na reta final (últimos 70 segmentos antes da chegada)
-  const pitStart = segments.length - 75;
-  const pitEnd = segments.length - 20;
+  // Criar Área de Pit Stop na reta final (últimos 85 segmentos antes da chegada)
+  const pitStart = segments.length - 85;
+  const pitEnd = segments.length - 25;
   for (let i = pitStart; i < pitEnd; i++) {
     if (segments[i]) segments[i].isPitLane = true;
   }
@@ -278,10 +268,10 @@ export function buildTrack(trackId = 'vegas') {
       seg.sprites.push({ type: 'sign_arrow_left', offset: 1.35 });
     }
 
-    // Outdoors do Top Gear
-    if (i % 60 === 0 && i > 10) {
-      const side = (i % 120 === 0) ? -1.6 : 1.6;
-      seg.sprites.push({ type: 'billboard_topgear', offset: side });
+    // Outdoors do TURBO HIGHWAY
+    if (i % 50 === 0 && i > 10) {
+      const side = (i % 100 === 0) ? -1.6 : 1.6;
+      seg.sprites.push({ type: 'billboard_turbo', offset: side });
     }
 
     // Vegetação e postes de iluminação
